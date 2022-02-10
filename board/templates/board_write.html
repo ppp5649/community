@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block body %}
+{% load static %}
+<div class="container">
+  <!-- 주제가 바뀔 때 마다 컨테이너를 새로 할당 -->
+  <div class="row">
+    <div class="col-sm-10">
+      <form method="POST" action=".">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+          {% if field.name == 'contents' %}
+          <textarea class="form-control" style="height : 250px" placeholder="욕설이 포함되거나 게시판 성격에 맞지 않는 글은 관리자에 의해 삭제조치 될 수 있습니다." name="{{ field.name }}"></textarea>
+          {% elif field.name == 'name' %}
+          <div>{{field}}</div>
+          {% else %}
+          <input type="{{ field.field.widget.input_type }}" class="form-control" id="{{ field.id_for_label }}"
+            placeholder="제목을 입력해주세요." name="{{ field.name }}" />
+          {% endif %}
+        </div>
+        {% if field.errors %}
+        <span style="color: red;">{{ field.errors }}</span>
+        {% endif %}
+        <br> <!-- 목록별 공백-->
+        {% endfor %}
+        <button type="submit" class="btn btn-primary">글쓰기</button>
+      </form>
+    </div>
+</div>
+  {% endblock body %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block body %}
+{% load static %}      
+<div class="container"> <!-- 주제가 바뀔 때 마다 컨테이너를 새로 할당 -->
+    <div class="row">
+        <div class="alert alert-dismissible alert-warning">
+            <h4 class="alert-heading">삭제 된 게시글입니다.</h4>
+            <button class="btn btn-dark" type ="button" onclick="location.href='/'">홈으로</button>
+        </div>
+    </div>
+</div>            
+{% endblock body %}

@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block body %}
+{% load static %}
+        <!-- Page Header-->
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="post-heading">
+                            <h1>{{board_detail.title}}</h1><br>
+                            <div>
+                                <i class="far fa-eye"> {{board_detail.viewCount}}</i>
+                                &nbsp;
+                                <i class="far fa-thumbs-up"> {{board_detail.likeCount}}</i>
+                            </div>
+                            <a href="#!">{{board_detail.writer}}</a>
+                            &nbsp;{{board_detail.created_at}}
+                            </a>
+                            <hr class="my-4" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!-- Post Content-->
+        <article class="mb-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-8">
+                        <p>{{board_detail.contents|linebreaks}}</p> 
+                        <!--안넣으면 띄어쓰기안됨-->
+                        {% if board_detail.img %}
+                        <img class="img-fluid" src="{{board_detail.img.url}}" alt="" /></a>
+                        {% endif %}
+                        <p>{{board_detail.category.names.0}}</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <div class="container position-relative px-4 px-lg-1">
+            <div class="row gx-4 gx-lg-5">
+                <div class="col-md-10 col-lg-8 col-xl-7">
+                    <form method="POST" action="{% url 'comment_write' board_detail.id %}">
+                        {% csrf_token %}
+                        {{comment_form}}
+                        <input type ="submit" value="댓글 작성 완료">
+                        {% for i in board_detail.comment_set.all %}
+
+                        <p>댓글 : {{i}}</p>
+                        <p>시간 : {{i.created_at}}</p>
+
+                        {% endfor %}
+                    </form>
+                </div>   
+            </div>
+        </div>
+{% endblock body %}
