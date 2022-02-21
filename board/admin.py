@@ -7,7 +7,8 @@ class PostAdmin(admin.ModelAdmin):
 
 
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ('comment_contents', 'created_at', 'updated_at')
+    list_display = ('comment_contents', 'comment_writer',
+                    'created_at', 'updated_at')
 
 
 admin.site.register(Post, PostAdmin)

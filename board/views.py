@@ -1,7 +1,7 @@
 from django.http import cookie, response
 from django.shortcuts import render, redirect
 from user.models import BoardMember
-from board.models import Post
+from board.models import Post, Comment
 from board.forms import BoardForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from datetime import date, datetime, timedelta
@@ -22,7 +22,8 @@ def major(request):
 
 def board_detail(request, pk):
     try:
-        # No such Column 오류 해결 -> DB 관련 문제같음 (마이그레이션)
+        # No Such Column 오류 해결 -> DB 관련 문제같음
+        # (마이그레이션 수시로 하면서 사이트 작동 잘 되는지 확인하기)
         context = dict()
         board_detail = Post.objects.get(pk=pk)
         comment_form = CommentForm()
@@ -31,8 +32,9 @@ def board_detail(request, pk):
         context['comment_form'] = comment_form
 
         response = render(request, 'board_detail.html', context)
-        # 'board_detail' 과 'comment_form'을 따로 render에 넣어줬을 땐 html 화면에 코드가 그대로 출력되는 오류가
-        # 발생했었는데 context로 묶어주고 딕셔너리 형태로 넣어주니 해결 되었다.
+        # 'board_detail' 과 'comment_form'을 따로 render에 넣어줬을 땐 html 화면에
+        # 코드가 그대로 출력되는 오류가 발생했었는데
+        # context로 묶어주고 각각 딕셔너리 형태로 넣어주니 해결 되었다.
 
         # 조회수 기능 (쿠키이용)
         expire_date, now = datetime.now(), datetime.now()
@@ -43,13 +45,13 @@ def board_detail(request, pk):
         expire_date -= now
         max_age = expire_date.total_seconds()
 
-        cookie_value = request.COOKIES.get('viewCount', '_')
+        cookie_value = request.COOKIES.get('view_count', '_')
 
         if f'_{pk}_' not in cookie_value:
             cookie_value += f'{pk}_'
-            response.set_cookie('viewCount', value=cookie_value,
+            response.set_cookie('view_count', value=cookie_value,
                                 max_age=max_age, httponly=True)
-            board_detail.viewCount += 1
+            board_detail.view_count += 1
             board_detail.save()
 
         return response
@@ -60,11 +62,21 @@ def board_detail(request, pk):
 
 
 def comment_write(request, pk):
+
+    if not request.session.get('user'):
+        return redirect('/user/login/')
+    # 세션에 'user' 키를 불러올 수 없으면, 로그인하지 않은 사용자이므로 로그인 페이지로 리다이렉트 한다.
+
     filled_form = CommentForm(request.POST)
 
     if filled_form.is_valid():
+        user_id = request.session.get('user')
+        user = BoardMember.objects.get(pk=user_id)
+        # User 검증 부분 -> Board_write 참고했음
+
         temp_form = filled_form.save(commit=False)
-        temp_form.connect = Post.objects.get(id=pk)
+        temp_form.comment_writer = user
+        temp_form.comment = Post.objects.get(id=pk)
         temp_form.save()
 
     return redirect('board_detail', pk)

@@ -8,9 +8,9 @@
                         <div class="post-heading">
                             <h1>{{board_detail.title}}</h1><br>
                             <div>
-                                <i class="far fa-eye"> {{board_detail.viewCount}}</i>
+                                <i class="far fa-eye"> {{board_detail.view_count}}</i>
                                 &nbsp;
-                                <i class="far fa-thumbs-up"> {{board_detail.likeCount}}</i>
+                                <i class="far fa-thumbs-up"> {{board_detail.like_count}}</i>
                             </div>
                             <a href="#!">{{board_detail.writer}}</a>
                             &nbsp;{{board_detail.created_at}}
@@ -36,18 +36,20 @@
                 </div>
             </div>
         </article>
-        <div class="container position-relative px-4 px-lg-1">
-            <div class="row gx-4 gx-lg-5">
-                <div class="col-md-10 col-lg-8 col-xl-7">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-8">
                     <form method="POST" action="{% url 'comment_write' board_detail.id %}">
                         {% csrf_token %}
                         {{comment_form}}
                         <input type ="submit" value="댓글 작성 완료">
-                        {% for i in board_detail.comment_set.all %}
-
-                        <p>댓글 : {{i}}</p>
-                        <p>시간 : {{i.created_at}}</p>
-
+                        {% for comment in board_detail.comment_set.all %}
+                        <!--특정 id값을 가진 comment를 모두 불러옴-->
+                        <hr class="my-4" />
+                        <a href="#!">{{comment.comment_writer}}</a>
+                        <p>{{comment}}</p>
+                        <h7>{{comment.created_at}}</h7>
+                        
                         {% endfor %}
                     </form>
                 </div>   
