@@ -6,4 +6,6 @@ urlpatterns = [
     path('major/', views.major, name='major'),
     path('<int:pk>/', views.board_detail, name='board_detail'),
     path('write/', views.board_write, name='board_write'),
+    path('<int:pk>/update/', views.board_update, name='board_update'),
+    path('<int:pk>/delete/', views.board_delete, name='board_delete'),
 ]

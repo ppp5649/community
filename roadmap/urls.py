@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
-from board.views import comment_write
+from board.views import comment_write, comment_update, comment_delete
 from main.views import index
 from user.views import home
 
@@ -31,6 +31,10 @@ urlpatterns = [
     path('accounts/', include('allauth.urls')),
     path('summernote/', include('django_summernote.urls')),
     path('comment_write/<int:pk>', comment_write, name="comment_write"),
+    path('comment_update/<int:pk>/<int:com_id>',
+         comment_update, name="comment_update"),
+    path('comment_delete/<int:pk>/<int:com_id>',
+         comment_delete, name="comment_delete"),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

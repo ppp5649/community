@@ -10,11 +10,11 @@
         {% for field in form %}
         <div class="form-group">
           {% if field.name == 'contents' %}
-          <textarea class="form-control" style="height : 250px" placeholder="욕설이 포함되거나 게시판 성격에 맞지 않는 글은 관리자에 의해 삭제조치 될 수 있습니다." name="{{ field.name }}"></textarea>
+          <textarea class="form-control" style="height : 250px" name="{{ field.name }}">{{base.contents}}</textarea>
           {% elif field.name == 'name' %}
           <div>{{field}}</div>
           {% else %}
-          <textarea class="form-control" style="height : 30px" placeholder="제목을 입력해주세요." name="{{ field.name }}"></textarea>
+          <textarea class="form-control" style="height : 30px" name="{{ field.name }}">{{base.title}}</textarea>
           {% endif %}
         </div>
         {% if field.errors %}
@@ -22,7 +22,7 @@
         {% endif %}
         <br> <!-- 목록별 공백-->
         {% endfor %}
-        <button type="submit" class="btn btn-primary">글쓰기</button>
+        <button type="submit" class="btn btn-primary">수정하기</button>
       </form>
     </div>
 </div>

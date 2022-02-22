@@ -1,5 +1,5 @@
 from django.http import cookie, response
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from user.models import BoardMember
 from board.models import Post, Comment
 from board.forms import BoardForm, CommentForm
@@ -61,27 +61,6 @@ def board_detail(request, pk):
       # 삭제 된 게시글은 삭제 게시글 안내 페이지로 이동
 
 
-def comment_write(request, pk):
-
-    if not request.session.get('user'):
-        return redirect('/user/login/')
-    # 세션에 'user' 키를 불러올 수 없으면, 로그인하지 않은 사용자이므로 로그인 페이지로 리다이렉트 한다.
-
-    filled_form = CommentForm(request.POST)
-
-    if filled_form.is_valid():
-        user_id = request.session.get('user')
-        user = BoardMember.objects.get(pk=user_id)
-        # User 검증 부분 -> Board_write 참고했음
-
-        temp_form = filled_form.save(commit=False)
-        temp_form.comment_writer = user
-        temp_form.comment = Post.objects.get(id=pk)
-        temp_form.save()
-
-    return redirect('board_detail', pk)
-
-
 def board_write(request):
     if not request.session.get('user'):
         return redirect('/user/login/')
@@ -111,3 +90,85 @@ def board_write(request):
         form = BoardForm()
 
     return render(request, 'board_write.html', {'form': form})
+
+
+def board_update(request, pk):
+    if not request.session.get('user'):
+        return redirect('/user/login/')
+    # 세션에 'user' 키를 불러올 수 없으면, 로그인하지 않은 사용자이므로 로그인 페이지로 리다이렉트 한다.
+
+    base = get_object_or_404(Post, pk=pk)
+
+    if request.method == "POST":
+        form = BoardForm(request.POST, request.FILES, instance=base)
+
+        if form.is_valid():
+            # form의 모든 validators 호출 유효성 검증 수행
+            form.save()
+
+            # 기존 글 작성 form을 다 지우고 form.save()만 넣었더니 정상적으로 이전 글 반영됨
+
+            return redirect(f'/board/{base.pk}')
+
+    else:
+        form = BoardForm(instance=base)
+
+    return render(request, 'board_update.html', {'form': form, 'base': base})
+
+
+def board_delete(request, pk):
+    if not request.session.get('user'):
+        return redirect('/user/login/')
+    # 세션에 'user' 키를 불러올 수 없으면, 로그인하지 않은 사용자이므로 로그인 페이지로 리다이렉트 한다.
+
+    post = get_object_or_404(Post, pk=pk)
+    post.delete()
+
+    return redirect('/')
+
+
+def comment_write(request, pk):
+
+    if not request.session.get('user'):
+        return redirect('/user/login/')
+    # 세션에 'user' 키를 불러올 수 없으면, 로그인하지 않은 사용자이므로 로그인 페이지로 리다이렉트 한다.
+
+    filled_form = CommentForm(request.POST)
+
+    if filled_form.is_valid():
+        user_id = request.session.get('user')
+        user = BoardMember.objects.get(pk=user_id)
+        # User 정보 불러오기 -> Board_write 참고했음
+
+        temp_form = filled_form.save(commit=False)
+        temp_form.comment_writer = user
+        temp_form.comment = Post.objects.get(id=pk)
+        temp_form.save()
+
+    return redirect('board_detail', pk)
+
+
+def comment_update(request, com_id, pk):
+    my_com = Comment.objects.get(id=com_id)
+    com_form = CommentForm(instance=my_com)
+
+    if request.method == "POST":
+        update_form = CommentForm(request.POST, instance=my_com)
+        # instance를 사용해 줌으로써 이전의 댓글이 남아있게 끔 해야함
+        if update_form.is_valid():
+            update_form.save()
+
+            return redirect('board_detail', pk)
+
+    return render(request, 'comment_update.html', {'com_form': com_form})
+
+
+def comment_delete(request, com_id, pk):
+    if not request.session.get('user'):
+        return redirect('/user/login/')
+
+    post = Post.objects.get(pk=pk)
+    my_com = Comment.objects.get(id=com_id)
+    my_com.delete()
+
+    return redirect(f'/board/{post.pk}')

@@ -14,7 +14,11 @@
                             </div>
                             <a href="#!">{{board_detail.writer}}</a>
                             &nbsp;{{board_detail.created_at}}
-                            </a>
+                            </a><br><br>
+                            <div class="post-edit">
+                                <a href="{% url 'board_update' board_detail.pk %}">수정</a>&nbsp;
+                                <a href="{% url 'board_delete' board_detail.pk %}" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
+                            </div>
                             <hr class="my-4" />
                         </div>
                     </div>
@@ -41,14 +45,18 @@
                 <div class="col-md-8">
                     <form method="POST" action="{% url 'comment_write' board_detail.id %}">
                         {% csrf_token %}
-                        {{comment_form}}
-                        <input type ="submit" value="댓글 작성 완료">
+                        <textarea class="form-control" style="height : 60px" placeholder="댓글을 입력해주세요." name="comment_contents"></textarea><br>
+                        <button type="submit" class="btn btn-primary">등록</button>
                         {% for comment in board_detail.comment_set.all %}
                         <!--특정 id값을 가진 comment를 모두 불러옴-->
                         <hr class="my-4" />
                         <a href="#!">{{comment.comment_writer}}</a>
                         <p>{{comment}}</p>
                         <h7>{{comment.created_at}}</h7>
+                        <div class="comment_edit">
+                            <a href="{% url 'comment_update' board_detail.id comment.id %}">수정</a>&nbsp;
+                            <a href="{% url 'comment_delete' board_detail.id comment.id %}" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
+                        </div>
                         
                         {% endfor %}
                     </form>
