@@ -13,7 +13,7 @@ class BoardForm(forms.ModelForm):
             'name',
             'title',
             'contents',
-
+            'img',
         ]
 
     name_choices = (('직업리뷰', '직업리뷰'), ('학과리뷰', '학과리뷰'))
@@ -30,10 +30,14 @@ class BoardForm(forms.ModelForm):
         'required': '내용을 입력하세요.'
     }, widget=forms.Textarea, label="게시글 내용")
 
+    img = forms.ImageField(error_messages={
+        'required': '이미지를 추가해주세요.'
+    })
+
 
 class CommentForm(forms.ModelForm):
 
     class Meta:
         model = Comment
 
-        fields = ('comment_contents',)
+        fields = ['comment_contents', ]

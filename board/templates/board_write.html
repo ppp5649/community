@@ -5,7 +5,7 @@
   <!-- 주제가 바뀔 때 마다 컨테이너를 새로 할당 -->
   <div class="row">
     <div class="col-sm-10">
-      <form method="POST" action=".">
+      <form method="POST" action="{% url 'board_write' %}" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form %}
         <div class="form-group">
@@ -13,8 +13,10 @@
           <textarea class="form-control" style="height : 250px" placeholder="욕설이 포함되거나 게시판 성격에 맞지 않는 글은 관리자에 의해 삭제조치 될 수 있습니다." name="{{ field.name }}"></textarea>
           {% elif field.name == 'name' %}
           <div>{{field}}</div>
-          {% else %}
+          {% elif field.name == 'title' %}
           <textarea class="form-control" style="height : 30px" placeholder="제목을 입력해주세요." name="{{ field.name }}"></textarea>
+          {% else %}
+          <input type="file" name = "{{ field.name }}">
           {% endif %}
         </div>
         {% if field.errors %}

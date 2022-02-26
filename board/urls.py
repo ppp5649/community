@@ -1,4 +1,6 @@
 from django.urls import path
+from django.conf.urls.static import static
+from django.conf import settings
 from . import views
 
 urlpatterns = [
@@ -9,3 +11,5 @@ urlpatterns = [
     path('<int:pk>/update/', views.board_update, name='board_update'),
     path('<int:pk>/delete/', views.board_delete, name='board_delete'),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

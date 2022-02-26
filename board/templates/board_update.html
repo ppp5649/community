@@ -10,11 +10,11 @@
         {% for field in form %}
         <div class="form-group">
           {% if field.name == 'contents' %}
-          <textarea class="form-control" style="height : 250px" name="{{ field.name }}">{{base.contents}}</textarea>
+          <textarea class="form-control" style="height : 250px" name="{{ field.name }}">{{post.contents}}</textarea>
           {% elif field.name == 'name' %}
           <div>{{field}}</div>
           {% else %}
-          <textarea class="form-control" style="height : 30px" name="{{ field.name }}">{{base.title}}</textarea>
+          <textarea class="form-control" style="height : 30px" name="{{ field.name }}">{{post.title}}</textarea>
           {% endif %}
         </div>
         {% if field.errors %}

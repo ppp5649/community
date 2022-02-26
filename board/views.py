@@ -25,14 +25,14 @@ def board_detail(request, pk):
         # No Such Column 오류 해결 -> DB 관련 문제같음
         # (마이그레이션 수시로 하면서 사이트 작동 잘 되는지 확인하기)
         context = dict()
-        board_detail = Post.objects.get(pk=pk)
+        post = Post.objects.get(pk=pk)
         comment_form = CommentForm()
 
-        context['board_detail'] = board_detail
+        context['post'] = post
         context['comment_form'] = comment_form
 
         response = render(request, 'board_detail.html', context)
-        # 'board_detail' 과 'comment_form'을 따로 render에 넣어줬을 땐 html 화면에
+        # 'post' 과 'comment_form'을 따로 render에 넣어줬을 땐 html 화면에
         # 코드가 그대로 출력되는 오류가 발생했었는데
         # context로 묶어주고 각각 딕셔너리 형태로 넣어주니 해결 되었다.
 
@@ -51,8 +51,8 @@ def board_detail(request, pk):
             cookie_value += f'{pk}_'
             response.set_cookie('view_count', value=cookie_value,
                                 max_age=max_age, httponly=True)
-            board_detail.view_count += 1
-            board_detail.save()
+            post.view_count += 1
+            post.save()
 
         return response
 
@@ -67,21 +67,22 @@ def board_write(request):
     # 세션에 'user' 키를 불러올 수 없으면, 로그인하지 않은 사용자이므로 로그인 페이지로 리다이렉트 한다.
 
     if request.method == "POST":
-        form = BoardForm(request.POST)
-
+        form = BoardForm(request.POST, request.FILES)
         if form.is_valid():
             # form의 모든 validators 호출 유효성 검증 수행
-            user_id = request.session.get('user')
+            user_id = request.session.get('user')  # 유저 고유의 id값
             user = BoardMember.objects.get(pk=user_id)
-
             post = Post()
             post.title = form.cleaned_data['title']
             post.contents = form.cleaned_data['contents']
             post.name = form.cleaned_data['name']
+            post.img = form.cleaned_data['img']
+
             # 검증에 성공한 값들은 사전타입으로 제공 (form.cleaned_data)
             # 검증에 실패시 form.error 에 오류 정보를 저장
 
             post.writer = user
+
             post.save()
 
             return redirect(f'/board/{post.pk}')
@@ -96,35 +97,46 @@ def board_update(request, pk):
     if not request.session.get('user'):
         return redirect('/user/login/')
     # 세션에 'user' 키를 불러올 수 없으면, 로그인하지 않은 사용자이므로 로그인 페이지로 리다이렉트 한다.
+    user_id = request.session.get('user')
+    post = get_object_or_404(Post, pk=pk)
 
-    base = get_object_or_404(Post, pk=pk)
+    if post.writer == BoardMember.objects.get(pk=user_id):
 
-    if request.method == "POST":
-        form = BoardForm(request.POST, request.FILES, instance=base)
+        if request.method == "POST":
+            form = BoardForm(request.POST, request.FILES, instance=post)
 
-        if form.is_valid():
-            # form의 모든 validators 호출 유효성 검증 수행
-            form.save()
+            if form.is_valid():
+                # form의 모든 validators 호출 유효성 검증 수행
+                form.save()
 
-            # 기존 글 작성 form을 다 지우고 form.save()만 넣었더니 정상적으로 이전 글 반영됨
+                # 기존 글 작성 form을 다 지우고 form.save()만 넣었더니 정상적으로 이전 글 반영됨
 
-            return redirect(f'/board/{base.pk}')
+                return redirect(f'/board/{post.pk}')
+
+        else:
+            form = BoardForm(instance=post)
+
+        return render(request, 'board_update.html', {'form': form, 'post': post})
 
     else:
-        form = BoardForm(instance=base)
-
-    return render(request, 'board_update.html', {'form': form, 'base': base})
+        return render(request, 'user_mismatch.html')
 
 
 def board_delete(request, pk):
     if not request.session.get('user'):
         return redirect('/user/login/')
     # 세션에 'user' 키를 불러올 수 없으면, 로그인하지 않은 사용자이므로 로그인 페이지로 리다이렉트 한다.
-
+    user_id = request.session.get('user')  # 유저 고유의 id값
     post = get_object_or_404(Post, pk=pk)
-    post.delete()
 
-    return redirect('/')
+    # 로그인 한 사용자와 글쓴이가 일치하는 경우
+    if post.writer == BoardMember.objects.get(pk=user_id):
+        post.delete()
+
+        return redirect('/')
+
+    else:
+        return render(request, 'user_mismatch.html')
 
 
 def comment_write(request, pk):
@@ -148,9 +160,9 @@ def comment_write(request, pk):
     return redirect('board_detail', pk)
 
 
-def comment_update(request, com_id, pk):
+""" def comment_update(request, com_id, pk):
+    post = get_object_or_404(Post, pk=pk)
     my_com = Comment.objects.get(id=com_id)
-    com_form = CommentForm(instance=my_com)
 
     if request.method == "POST":
         update_form = CommentForm(request.POST, instance=my_com)
@@ -158,17 +170,24 @@ def comment_update(request, com_id, pk):
         if update_form.is_valid():
             update_form.save()
 
-            return redirect('board_detail', pk)
+            return redirect(f'/board/{post.pk}')
 
-    return render(request, 'comment_update.html', {'com_form': com_form})
+    return render(request, 'comment_update.html', {'my_com': my_com, 'post': post}) """
 
 
 def comment_delete(request, com_id, pk):
     if not request.session.get('user'):
         return redirect('/user/login/')
 
+    user_id = request.session.get('user')
     post = Post.objects.get(pk=pk)
     my_com = Comment.objects.get(id=com_id)
-    my_com.delete()
 
-    return redirect(f'/board/{post.pk}')
+    if my_com.comment_writer == BoardMember.objects.get(pk=user_id):
+
+        my_com.delete()
+
+        return redirect(f'/board/{post.pk}')
+
+    else:
+        return render(request, 'user_mismatch.html')

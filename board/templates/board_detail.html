@@ -6,18 +6,18 @@
                 <div class="row">
                     <div class="col-md-8">
                         <div class="post-heading">
-                            <h1>{{board_detail.title}}</h1><br>
+                            <h1>{{post.title}}</h1><br>
                             <div>
-                                <i class="far fa-eye"> {{board_detail.view_count}}</i>
+                                <i class="far fa-eye"> {{post.view_count}}</i>
                                 &nbsp;
-                                <i class="far fa-thumbs-up"> {{board_detail.like_count}}</i>
+                                <i class="far fa-thumbs-up"> {{post.like_count}}</i>
                             </div>
-                            <a href="#!">{{board_detail.writer}}</a>
-                            &nbsp;{{board_detail.created_at}}
+                            <a href="#!">{{post.writer}}</a>
+                            &nbsp;{{post.created_at}}
                             </a><br><br>
                             <div class="post-edit">
-                                <a href="{% url 'board_update' board_detail.pk %}">수정</a>&nbsp;
-                                <a href="{% url 'board_delete' board_detail.pk %}" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
+                                <a href="{% url 'board_update' post.pk %}">수정</a>&nbsp;
+                                <a href="{% url 'board_delete' post.pk %}" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
                             </div>
                             <hr class="my-4" />
                         </div>
@@ -30,12 +30,12 @@
             <div class="container">
                 <div class="row">
                     <div class="col-md-8">
-                        <p>{{board_detail.contents|linebreaks}}</p> 
+                        <p>{{post.contents|linebreaks}}</p> 
                         <!--안넣으면 띄어쓰기안됨-->
-                        {% if board_detail.img %}
-                        <img class="img-fluid" src="{{board_detail.img.url}}" alt="" /></a>
+                        {% if post.img %}
+                        <img class="img-fluid" src="{{post.img.url}}" width="200"></a><br>
+                        {% else %}
                         {% endif %}
-                        <p>{{board_detail.category.names.0}}</p>
                     </div>
                 </div>
             </div>
@@ -43,19 +43,18 @@
         <div class="container">
             <div class="row">
                 <div class="col-md-8">
-                    <form method="POST" action="{% url 'comment_write' board_detail.id %}">
+                    <form method="POST" action="{% url 'comment_write' post.id %}">
                         {% csrf_token %}
                         <textarea class="form-control" style="height : 60px" placeholder="댓글을 입력해주세요." name="comment_contents"></textarea><br>
                         <button type="submit" class="btn btn-primary">등록</button>
-                        {% for comment in board_detail.comment_set.all %}
+                        {% for comment in post.comment_set.all %}
                         <!--특정 id값을 가진 comment를 모두 불러옴-->
                         <hr class="my-4" />
                         <a href="#!">{{comment.comment_writer}}</a>
                         <p>{{comment}}</p>
                         <h7>{{comment.created_at}}</h7>
                         <div class="comment_edit">
-                            <a href="{% url 'comment_update' board_detail.id comment.id %}">수정</a>&nbsp;
-                            <a href="{% url 'comment_delete' board_detail.id comment.id %}" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
+                            <a href="{% url 'comment_delete' post.id comment.id %}" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
                         </div>
                         
                         {% endfor %}
