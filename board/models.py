@@ -5,7 +5,8 @@ from django.db import models
 class Post(models.Model):
     title = models.CharField(max_length=200, verbose_name="제목")
     contents = models.TextField(verbose_name="내용")
-    img = models.ImageField(verbose_name="이미지", null=True, blank=True)
+    img = models.ImageField(verbose_name="이미지", null=True,
+                            blank=True, upload_to='images/')
     writer = models.ForeignKey(
         'user.BoardMember', on_delete=models.CASCADE, null=True, verbose_name="작성자")
     created_at = models.DateTimeField(
