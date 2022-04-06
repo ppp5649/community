@@ -2,7 +2,7 @@ from xml.etree.ElementTree import Comment
 from django.contrib.auth.hashers import check_password
 
 from django import forms
-from board.models import Post, Comment
+from board.models import Post, Comment, Photo
 
 
 class BoardForm(forms.ModelForm):
@@ -13,7 +13,6 @@ class BoardForm(forms.ModelForm):
             'name',
             'title',
             'contents',
-            'img',
         ]
 
     name_choices = (('직업리뷰', '직업리뷰'), ('학과리뷰', '학과리뷰'))
@@ -30,9 +29,19 @@ class BoardForm(forms.ModelForm):
         'required': '내용을 입력하세요.'
     }, widget=forms.Textarea, label="게시글 내용")
 
-    img = forms.ImageField(error_messages={
-        'required': '이미지를 추가해주세요.'
-    })
+# 기존 BoardForm에 있던 img를 ImageForm으로 따로 떼어냄
+
+
+class ImageForm(forms.ModelForm):
+    class Meta:
+        model = Photo
+        fields = ['img']
+
+
+# 이미지를 가져와 엮어서 폼셋을 만들어주는 역할
+# 여기서 Post와 Photo 가 1:N 관계를 형성하고 form=폼 이름과 extra=이미지 갯수를 지정해줌
+ImageFormSet = forms.inlineformset_factory(
+    Post, Photo, form=ImageForm, extra=3)
 
 
 class CommentForm(forms.ModelForm):

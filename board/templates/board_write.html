@@ -15,8 +15,6 @@
           <div>{{field}}</div>
           {% elif field.name == 'title' %}
           <textarea class="form-control" style="height : 30px" placeholder="제목을 입력해주세요." name="{{ field.name }}"></textarea>
-          {% else %}
-          <input type="file" name = "{{ field.name }}">
           {% endif %}
         </div>
         {% if field.errors %}
@@ -24,6 +22,7 @@
         {% endif %}
         <br> <!-- 목록별 공백-->
         {% endfor %}
+        {{ image_formset.as_p }}
         <button type="submit" class="btn btn-primary">글쓰기</button>
       </form>
     </div>

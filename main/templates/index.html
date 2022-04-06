@@ -7,7 +7,7 @@
           <h4>직업리뷰</h4>
           <hr class="my-4" />
           {% for job_model in job_models %}
-          {% if job_model.img %}
+          {% if job_model.photo_set.all %}
           <div class="post-preview">
             <i class="far fa-image"></i>
             <a href="{% url 'board_detail' job_model.pk %}">

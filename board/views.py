@@ -1,12 +1,11 @@
 from django.http import cookie, response
 from django.shortcuts import get_object_or_404, render, redirect
 from user.models import BoardMember
-from board.models import Post, Comment
-from board.forms import BoardForm, CommentForm
+from board.models import Post, Comment, Photo
+from board.forms import BoardForm, CommentForm, ImageForm, ImageFormSet
 from django.contrib.auth.decorators import login_required
 from datetime import date, datetime, timedelta
-
-# Create your views here.
+from django.db import transaction
 
 
 def job(request):
@@ -22,6 +21,8 @@ def major(request):
 
 def board_detail(request, pk):
     try:
+        photo = Photo()
+        print(photo.img)
         # No Such Column 오류 해결 -> DB 관련 문제같음
         # (마이그레이션 수시로 하면서 사이트 작동 잘 되는지 확인하기)
         context = dict()
@@ -67,30 +68,33 @@ def board_write(request):
     # 세션에 'user' 키를 불러올 수 없으면, 로그인하지 않은 사용자이므로 로그인 페이지로 리다이렉트 한다.
 
     if request.method == "POST":
-        form = BoardForm(request.POST, request.FILES)
-        if form.is_valid():
+        form = BoardForm(request.POST)
+        image_formset = ImageFormSet(request.POST, request.FILES)
+        if form.is_valid() and image_formset.is_valid():
             # form의 모든 validators 호출 유효성 검증 수행
             user_id = request.session.get('user')  # 유저 고유의 id값
             user = BoardMember.objects.get(pk=user_id)
             post = Post()
-            post.title = form.cleaned_data['title']
-            post.contents = form.cleaned_data['contents']
-            post.name = form.cleaned_data['name']
-            post.img = form.cleaned_data['img']
 
-            # 검증에 성공한 값들은 사전타입으로 제공 (form.cleaned_data)
-            # 검증에 실패시 form.error 에 오류 정보를 저장
+            with transaction.atomic():
+                post.title = form.cleaned_data['title']
+                post.contents = form.cleaned_data['contents']
+                post.name = form.cleaned_data['name']
 
-            post.writer = user
+                # 검증에 성공한 값들은 사전타입으로 제공 (form.cleaned_data)
+                # 검증에 실패시 form.error 에 오류 정보를 저장
+                post.writer = user
+                post.save()
+                image_formset.instance = post
+                image_formset.save()
 
-            post.save()
-
-            return redirect(f'/board/{post.pk}')
+                return redirect(f'/board/{post.pk}')
 
     else:
         form = BoardForm()
+        image_formset = ImageFormSet()
 
-    return render(request, 'board_write.html', {'form': form})
+    return render(request, 'board_write.html', {'form': form, 'image_formset': image_formset})
 
 
 def board_update(request, pk):

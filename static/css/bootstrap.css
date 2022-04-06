@@ -3066,7 +3066,12 @@ textarea.form-control-lg {
     transition: none;
   }
 }
-
+/* Social login */
+.btn-kakao {
+  color: #fff;
+  background-color: #feec34;
+  border-color: #feec34;
+}
 .btn:hover {
   color: #888;
 }

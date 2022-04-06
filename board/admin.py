@@ -1,5 +1,5 @@
 from django.contrib import admin
-from board.models import Post, Comment
+from board.models import Post, Comment, Photo
 
 
 class PostAdmin(admin.ModelAdmin):
@@ -12,5 +12,10 @@ class CommentAdmin(admin.ModelAdmin):
                     'created_at', 'updated_at')
 
 
+class PhotoAdmin(admin.ModelAdmin):
+    list_display = ('img',)
+
+
 admin.site.register(Post, PostAdmin)
 admin.site.register(Comment, CommentAdmin)
+admin.site.register(Photo, PhotoAdmin)
