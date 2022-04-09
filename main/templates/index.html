@@ -51,7 +51,7 @@
           <h4>학과리뷰</h4>
           <hr class="my-4" />
           {% for major_model in major_models %}
-          {% if major_model.img %}
+          {% if major_model.photo_set.all %}
           <div class="post-preview">
               <i class="far fa-image"></i>
               <a href="{% url 'board_detail' major_model.pk %}">
