@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 {% block body %}
-{% load static %}      
-<div class="container"> <!-- 주제가 바뀔 때 마다 컨테이너를 새로 할당 -->
+{% load static %}
+<div class="container">
+    <!-- 주제가 바뀔 때 마다 컨테이너를 새로 할당 -->
     <div class="row">
         <div class="col-sm-4">
             <div class="card border-primary mb-3" style="max-width: 25rem;">
@@ -9,7 +10,7 @@
                 {% for board_detail in post %}
                 <div class="card-body">
                     <a href="{% url 'board_detail' board_detail.pk %}">
-                    <h6 class="card-title">{{board_detail.title}}</h6>
+                        <h6 class="card-title">{{board_detail.title}}</h6>
                     </a>
                     <p class="card-text">작성자
                         <a href="{% url 'board_detail' board_detail.pk %}">{{board_detail.writer}}</a><br>
@@ -25,5 +26,5 @@
             </div>
         </div>
     </div>
-</div>        
+</div>
 {% endblock body %}

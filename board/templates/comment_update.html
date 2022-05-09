@@ -1,66 +1,66 @@
 {% extends "base.html" %}
 {% block body %}
 {% load static %}
-        <!-- Page Header-->
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="post-heading">
-                            <h1>{{post.title}}</h1><br>
-                            <div>
-                                <i class="far fa-eye"> {{post.view_count}}</i>
-                                &nbsp;
-                                <i class="far fa-thumbs-up"> {{post.like_count}}</i>
-                            </div>
-                            <a href="#!">{{post.writer}}</a>
-                            &nbsp;{{post.created_at}}
-                            </a><br><br>
-                            <div class="post-edit">
-                                <a href="{% url 'board_update' post.pk %}">수정</a>&nbsp;
-                                <a href="{% url 'board_delete' post.pk %}" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
-                            </div>
-                            <hr class="my-4" />
-                        </div>
-                    </div>
+<!-- Page Header-->
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="post-heading">
+                <h1>{{post.title}}</h1><br>
+                <div>
+                    <i class="far fa-eye"> {{post.view_count}}</i>
+                    &nbsp;
+                    <i class="far fa-thumbs-up"> {{post.like_count}}</i>
                 </div>
-            </div>
-        </header>
-        <!-- Post Content-->
-        <article class="mb-4">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-8">
-                        <p>{{post.contents|linebreaks}}</p> 
-                        <!--안넣으면 띄어쓰기안됨-->
-                        {% if post.img %}
-                        <img class="img-fluid" src="{{post.img.url}}" alt="" /></a>
-                        {% endif %}
-                        <p>{{post.category.names.0}}</p>
-                    </div>
+                <a href="#!">{{post.writer}}</a>
+                &nbsp;{{post.created_at}}
+                </a><br><br>
+                <div class="post-edit">
+                    <a href="{% url 'board_update' post.pk %}">수정</a>&nbsp;
+                    <a href="{% url 'board_delete' post.pk %}" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
                 </div>
-            </div>
-        </article>
-        <div class="container">
-            <div class="row">
-                <div class="col-md-8">
-                    <form method="POST" action="{% url 'comment_write' post.id %}">
-                        {% csrf_token %}
-                        <textarea class="form-control" style="height : 60px" name="comment_contents">{{my_com.comment_contents}}</textarea><br>
-                        <button type="submit" class="btn btn-primary">수정하기</button>
-                        {% for comment in post.comment_set.all %}
-                        <!--특정 id값을 가진 comment를 모두 불러옴-->
-                        <hr class="my-4" />
-                        <a href="#!">{{comment.comment_writer}}</a>
-                        <p>{{comment}}</p>
-                        <h7>{{comment.created_at}}</h7>
-                        <div class="comment_edit">
-                            <a href="{% url 'comment_update' post.id comment.id %}">수정</a>&nbsp;
-                            <a href="{% url 'comment_delete' post.id comment.id %}" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
-                        </div>
-                        
-                        {% endfor %}
-                    </form>
-                </div>   
+                <hr class="my-4" />
             </div>
         </div>
+    </div>
+</div>
+</header>
+<!-- Post Content-->
+<article class="mb-4">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <p>{{post.contents|linebreaks}}</p>
+                <!--안넣으면 띄어쓰기안됨-->
+                {% if post.img %}
+                <img class="img-fluid" src="{{post.img.url}}" alt="" /></a>
+                {% endif %}
+                <p>{{post.category.names.0}}</p>
+            </div>
+        </div>
+    </div>
+</article>
+<div class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <form method="POST" action="{% url 'comment_write' post.id %}">
+                {% csrf_token %}
+                <textarea class="form-control" style="height : 60px" name="comment_contents">{{my_com.comment_contents}}</textarea><br>
+                <button type="submit" class="btn btn-primary">수정하기</button>
+                {% for comment in post.comment_set.all %}
+                <!--특정 id값을 가진 comment를 모두 불러옴-->
+                <hr class="my-4" />
+                <a href="#!">{{comment.comment_writer}}</a>
+                <p>{{comment}}</p>
+                <h7>{{comment.created_at}}</h7>
+                <div class="comment_edit">
+                    <a href="{% url 'comment_update' post.id comment.id %}">수정</a>&nbsp;
+                    <a href="{% url 'comment_delete' post.id comment.id %}" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</a>
+                </div>
+
+                {% endfor %}
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock body %}
