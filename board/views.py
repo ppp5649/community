@@ -22,13 +22,11 @@ def major(request):
 def board_detail(request, pk):
     try:
         photo = Photo()
-        print(photo.img)
         # No Such Column 오류 해결 -> DB 관련 문제같음
         # (마이그레이션 수시로 하면서 사이트 작동 잘 되는지 확인하기)
         context = dict()
         post = Post.objects.get(pk=pk)
         comment_form = CommentForm()
-
         context['post'] = post
         context['comment_form'] = comment_form
 
